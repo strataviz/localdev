@@ -1,0 +1,6 @@
+sinks:
+  kafka:
+    analytics:
+      topic: events
+      brokers:
+        - analytics-0.analytics.default.svc.cluster.local:9092

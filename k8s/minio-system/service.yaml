@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-console
+  namespace: minio-system
+  labels:
+    app.kubernetes.io/name: minio-operator
+    app.kubernetes.io/version: "v5.0.9"
+spec:
+  ports:
+  - name: http
+    port: 9090
+  - name: https
+    port: 9443
+  selector:
+    app.kubernetes.io/name: minio-operator-console
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-operator
+  namespace: minio-system
+  labels:
+    app.kubernetes.io/name: minio-operator
+    app.kubernetes.io/version: "v5.0.9"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 4221
+      name: http
+  selector:
+    operator: leader
+    app.kubernetes.io/name: minio-operator
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-sts
+  namespace: minio-system
+  labels:
+    app.kubernetes.io/name: minio-operator
+    app.kubernetes.io/version: "v5.0.9"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 4223
+      name: https
+  selector:
+    app.kubernetes.io/name: minio-operator

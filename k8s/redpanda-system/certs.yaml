@@ -1,0 +1,12 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: redpanda-operator-selfsigned-issuer
+  namespace: redpanda-system
+  labels:
+    app.kubernetes.io/name: redpanda-operator
+    app.kubernetes.io/instance: redpanda
+    app.kubernetes.io/version: "v23.2.12"
+spec:
+  selfSigned: {}

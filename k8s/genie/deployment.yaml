@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: genie
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: genie
+  template:
+    metadata:
+      labels:
+        name: genie
+    spec:
+      containers:
+        - name: genie
+          image: docker.io/strataviz/genie:0.1.1
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+          command:
+            - /genie
+            - generate
+            - -c
+            - /etc/genie.d
+            - -s
+            - kafka.analytics
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+          volumeMounts:
+            - name: genie-d
+              mountPath: /etc/genie.d
+      volumes:
+        - name: genie-d
+          configMap:
+            name: genie-d

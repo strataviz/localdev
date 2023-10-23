@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+commonAnnotations:
+  strata.ctx.sh/authors: "StrataViz"
+  strata.ctx.sh/support: "https://github.com/strataviz/localdev/issues"
+commonLabels:
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/group: genie
+resources:
+  - deployment.yaml
+configMapGenerator:
+  - name: genie-d
+    files:
+      - ./config/genie.d/config.yaml
+      - ./config/genie.d/planet_logs.tmpl
+      - ./config/genie.d/nginx_logs.tmpl
+      - ./config/genie.d/resources_docker_names.yaml
+      - ./config/genie.d/resources_messages.yaml
+      - ./config/genie.d/resources_user_agents.yaml
+      - ./config/genie.d/resources.yaml
+      - ./config/genie.d/sinks.yaml

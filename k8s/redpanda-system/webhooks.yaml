@@ -1,0 +1,79 @@
+# ---
+# apiVersion: cert-manager.io/v1
+# kind: Certificate
+# metadata:
+#   name: redpanda-webhook-cert
+#   namespace: redpanda-system
+#   labels:
+#     app.kubernetes.io/name: redpanda-operator
+#     app.kubernetes.io/instance: redpanda
+#     app.kubernetes.io/version: "v23.2.12"
+# spec:
+#   dnsNames:
+#     - redpanda-operator-webhook-service.redpanda-system.svc
+#     - redpanda-operator-webhook-service.redpanda-system.svc.cluster.local
+#   issuerRef:
+#     kind: Issuer
+#     name: redpanda-operator-selfsigned-issuer
+#   secretName: redpanda-webhook-cert
+#   privateKey:
+#     rotationPolicy: Never
+# ---
+# apiVersion: admissionregistration.k8s.io/v1
+# kind: MutatingWebhookConfiguration
+# metadata:
+#   annotations:
+#     cert-manager.io/inject-ca-from: redpanda-system/redpanda-serving-cert
+#   name: redpanda-operator-mutating-webhook-configuration
+# webhooks:
+#   - admissionReviewVersions:
+#     - v1
+#     - v1beta1
+#     clientConfig:
+#       service:
+#         name: redpanda-operator-webhook-service
+#         namespace: redpanda-system
+#         path: /mutate-redpanda-vectorized-io-v1alpha1-cluster
+#     failurePolicy: Fail
+#     name: mcluster.kb.io
+#     rules:
+#     - apiGroups:
+#       - redpanda.vectorized.io
+#       apiVersions:
+#       - v1alpha1
+#       operations:
+#       - CREATE
+#       - UPDATE
+#       resources:
+#       - clusters
+#     sideEffects: None
+# ---
+# # Source: operator/templates/validating_webhook.yaml
+# apiVersion: admissionregistration.k8s.io/v1
+# kind: ValidatingWebhookConfiguration
+# metadata:
+#   annotations:
+#     cert-manager.io/inject-ca-from: redpanda-system/redpanda-serving-cert
+#   name: redpanda-operator-validating-webhook-configuration
+# webhooks:
+#   - admissionReviewVersions:
+#     - v1
+#     - v1beta1
+#     clientConfig:
+#       service:
+#         name: redpanda-operator-webhook-service
+#         namespace: redpanda-system
+#         path: /validate-redpanda-vectorized-io-v1alpha1-cluster
+#     failurePolicy: Fail
+#     name: mcluster.kb.io
+#     rules:
+#     - apiGroups:
+#       - redpanda.vectorized.io
+#       apiVersions:
+#       - v1alpha1
+#       operations:
+#       - CREATE
+#       - UPDATE
+#       resources:
+#       - clusters
+#     sideEffects: None

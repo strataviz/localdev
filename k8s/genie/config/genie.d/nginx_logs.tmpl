@@ -1,0 +1,16 @@
+{
+  <# $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" "$http_x_forwarded_for"'; #>
+  "message": "<<ipaddr.internal>> - - [<<timestamp.now_common_log>>] \"<<list.method>> <<list.path>> HTTP/1.1\" <<list.status_code>> <<integer_range.size>> \"-\" \"<<list.user_agent>>\" \"<<ipaddr.external>>\"",
+  "aws_az": "<<list.aws_region>><<list.aws_zone>>",
+  "aws_region": "<<list.aws_region>>",
+  "container": {
+    "id":"<<random_string.container_id>>",
+    "name":"<<list.left_names>>-<<list.right_names>>"
+  },
+  "host": "<<planet>>-main-<<random_string.host_id>>",
+  "k8s": {
+    "arch":"<<list.arch>>",
+    "node":"ip-<<integer_range.octet>>-<<integer_range.octet>>-<<integer_range.octet>>-<<integer_range.octet>>.ec2.internal",
+    "pod":"<<planet>>-main-<<random_string.ten>>-<<random_string.five>>"
+  }
+}

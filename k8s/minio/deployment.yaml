@@ -1,0 +1,58 @@
+# TODO: convert me to a tenent that can be managed through the minio operator
+# there were some issues in cert generation that I gave up on for now.  I'd like
+# to revisit it soon and get minio working with cert-manager.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  labels:
+    app: minio
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: minio
+      labels:
+        app: minio
+    spec:
+      containers:
+        - name: minio
+          image: quay.io/minio/minio:latest
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: 9000
+            initialDelaySeconds: 120
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /minio/health/ready
+              port: 9000
+            initialDelaySeconds: 120
+            periodSeconds: 20
+          resources:
+            requests:
+              memory: "1000Mi"
+              cpu: "1000m"
+            limits:
+              memory: "1500Mi"
+              cpu: "1500m"
+
+          volumeMounts:
+            - mountPath: /data
+              name: data
+          command:
+            - /bin/bash
+            - -c
+          args:
+              - minio server /data --console-address :9090
+      restartPolicy: Always
+      volumes:
+        - name: data
+          hostPath:
+            path: /data
+  selector:
+    matchLabels:
+      app: minio

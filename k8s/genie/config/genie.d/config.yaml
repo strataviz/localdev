@@ -1,0 +1,12 @@
+events:
+  - name: planet_logs
+    generators: 1
+    vars:
+      - name: version
+        value: v1
+    template: planet_logs.tmpl
+  # Change me as I will be expecting any logs that are collected to be already structured
+  # by the collector.
+  - name: nginx_logs
+    generators: 1
+    template: nginx_logs.tmpl

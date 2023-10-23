@@ -1,0 +1,4 @@
+.local/
+.minio/
+bin/
+k8s/tailscale/client_*

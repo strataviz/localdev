@@ -1,0 +1,9 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: console-env
+  namespace: minio-system
+data:
+  CONSOLE_PORT: "9090"
+  CONSOLE_TLS_PORT: "9443"
