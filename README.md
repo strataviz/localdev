@@ -6,6 +6,7 @@ Localdev provides an workstation/laptop based development environment for Strata
 * Spark Operator for managing spark and beam jobs. 
 * RedPanda to provide a streaming data platform.
 * Genie for custom event generation.
+* Tailscale operator for exposing ingresses and services inside a tailnet mesh
 
 The tailscale operator is not installed by default since there are external dependencies in setting up, but can be installed after the base system.
 
@@ -23,6 +24,12 @@ To change the name and extra mounts:
 
 ```
 CLUSTER_NAME=strataviz SRCDIR=$PWD make
+```
+
+To install the tailscale operator follow the directions below and then run:
+
+```
+make install-tailscale
 ```
 
 ## Stop
