@@ -81,6 +81,9 @@ uninstall-redpanda-system: install-cert-manager
 .PHONY: install-redpanda
 install-redpanda: install-redpanda-system
 	@$(KUSTOMIZE) build k8s/redpanda | envsubst | kubectl apply -f -
+## We also need to wait a few seconds for the operator to create the statefulset otherwise
+## the wait will fail.  For some reason it takes a bit of time to create the statefulset.
+	@sleep 10
 ## Because statefulsets don't set the condition we have to do some trickery and grab
 ## the replicas from the spec then use the availableReplicas equal to the expected
 ## replicas for the wait condition. It's not ideal, but it works for now.  If any other
@@ -88,9 +91,6 @@ install-redpanda: install-redpanda-system
 ## then each will need to be added with their own wait, unlike the other deployments that
 ## we can group together with labels.
 	$(eval REPLICAS := $(shell kubectl get sts -l app.kubernetes.io/instance=analytics -o=custom-columns=:spec.replicas --no-headers))
-## We also need to wait a few seconds for the operator to create the statefulset otherwise
-## the wait will fail.  For some reason it takes a bit of time to create the statefulset.
-	@sleep 10
 	@kubectl wait --for=jsonpath='{.status.availableReplicas}'=$(REPLICAS) --timeout=120s sts -l app.kubernetes.io/instance=analytics
 
 .PHONY: uninstall-redpanda
