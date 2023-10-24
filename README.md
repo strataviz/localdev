@@ -32,6 +32,8 @@ To install the tailscale operator follow the directions below and then run:
 make install-tailscale
 ```
 
+***Note: The redpanda operator can be a bit slow to create the statefulset that manages the nodes and will sometimes fail.  There's a 15 second delay to account for this, but if it fails you can re-run the make command and it will continue.***
+
 ## Stop
 
 To remove all of the localdev environment, run:

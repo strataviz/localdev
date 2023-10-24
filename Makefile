@@ -88,8 +88,9 @@ install-redpanda: install-redpanda-system
 ## then each will need to be added with their own wait, unlike the other deployments that
 ## we can group together with labels.
 	$(eval REPLICAS := $(shell kubectl get sts -l app.kubernetes.io/instance=analytics -o=custom-columns=:spec.replicas --no-headers))
-## We also need to wait a few seconds for the operator to create the statefulset
-	@sleep 5
+## We also need to wait a few seconds for the operator to create the statefulset otherwise
+## the wait will fail.  For some reason it takes a bit of time to create the statefulset.
+	@sleep 10
 	@kubectl wait --for=jsonpath='{.status.availableReplicas}'=$(REPLICAS) --timeout=120s sts -l app.kubernetes.io/instance=analytics
 
 .PHONY: uninstall-redpanda
