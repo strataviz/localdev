@@ -136,6 +136,15 @@ install-otel-system:
 uninstall-otel-system:
 	-@kubectl delete -k k8s/otel-system
 
+.PHONY: install-argocd
+install-argocd:
+	@$(KUSTOMIZE) build k8s/argocd | envsubst | kubectl apply -f -
+	@kubectl wait --for=condition=available --timeout=120s deploy -l app.kubernetes.io/group=argocd -n argocd
+
+.PHONY: uninstall-argocd
+uninstall-argocd:
+	-@kubectl delete -k k8s/argocd
+
 .PHONY: clean
 clean:
 	@kind delete cluster --name=localdev
