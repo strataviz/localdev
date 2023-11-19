@@ -30,17 +30,20 @@ $(KUSTOMIZE): $(LOCALBIN)
 ## interact with both the clusters and applications to set up
 ## the environment in a customized way.
 .PHONY: localdev
-localdev: kind-start kind-apply
+localdev: kind install
 
-.PHONY: kind-start
-kind-start:
+.PHONY: kind
+kind:
 	@./scripts/kind-start.sh $(CLUSTER_NAME) $(SRCDIR)
 
 ## Installs everything except for the tailscale operator.  I'll add
 ## this in as optional based on an environment variable plus I actually
 ## need to get it working properly and document it.
-.PHONY: kind-apply
-kind-apply: $(KUSTOMIZE) $(MINIODIR) install-cert-manager install-spark-system install-redpanda install-genie install-minio
+.PHONY: install
+install: $(KUSTOMIZE) $(MINIODIR) install-cert-manager install-spark-system install-redpanda install-genie install-minio install-otel-system
+
+.PHONY: uninstall
+uninstall: uninstall-otel-system uninstall-minio uninstall-genie uninstall-redpanda uninstall-spark-system uninstall-cert-manager
 
 .PHONY: install-cert-manager
 install-cert-manager:
@@ -49,7 +52,7 @@ install-cert-manager:
 
 .PHONY: uninstall-cert-manager
 uninstall-cert-manager:
-	@kubectl delete -k k8s/cert-manager
+	-@kubectl delete -k k8s/cert-manager
 
 .PHONY: install-tailscale
 install-tailscale:
@@ -58,7 +61,7 @@ install-tailscale:
 
 .PHONY: uninstall-tailscale
 uninstall-tailscale:
-	@kubectl delete -k k8s/tailscale
+	-@kubectl delete -k k8s/tailscale
 
 .PHONY: install-spark-system
 install-spark-system:
@@ -67,7 +70,7 @@ install-spark-system:
 
 .PHONY: uninstall-spark-system
 uninstall-spark-system:
-	@kubectl delete -k k8s/spark-system
+	-@kubectl delete -k k8s/spark-system
 
 .PHONY: install-redpanda-system
 install-redpanda-system:
@@ -76,7 +79,7 @@ install-redpanda-system:
 
 .PHONY: uninstall-redpanda-system
 uninstall-redpanda-system: install-cert-manager
-	@kubectl delete -k k8s/redpanda-system
+	-@kubectl delete -k k8s/redpanda-system
 
 .PHONY: install-redpanda
 install-redpanda: install-redpanda-system
@@ -95,7 +98,7 @@ install-redpanda: install-redpanda-system
 
 .PHONY: uninstall-redpanda
 uninstall-redpanda:
-	@kubectl delete -k k8s/redpanda
+	-@kubectl delete -k k8s/redpanda
 
 .PHONY: install-genie
 install-genie: install-redpanda
@@ -104,7 +107,7 @@ install-genie: install-redpanda
 
 .PHONY: uninstall-genie
 uninstall-genie:
-	@kubectl delete -k k8s/genie
+	-@kubectl delete -k k8s/genie
 
 .PHONY: install-minio-system
 install-minio-system:
@@ -113,7 +116,7 @@ install-minio-system:
 
 .PHONY: uninstall-minio-system
 uninstall-minio-system:
-	@kubectl delete -k k8s/minio-system
+	-@kubectl delete -k k8s/minio-system
 
 .PHONY: install-minio
 install-minio:
@@ -122,7 +125,16 @@ install-minio:
 
 .PHONY: uninstall-minio
 uninstall-minio:
-	@kubectl delete -k k8s/minio
+	-@kubectl delete -k k8s/minio
+
+.PHONY: install-otel-system
+install-otel-system:
+	@$(KUSTOMIZE) build k8s/otel-system | envsubst | kubectl apply -f -
+	@kubectl wait --for=condition=available --timeout=120s deploy -l app.kubernetes.io/group=otel-system -n opentelemetry-operator-system
+
+.PHONY: uninstall-otel-system
+uninstall-otel-system:
+	-@kubectl delete -k k8s/otel-system
 
 .PHONY: clean
 clean:
