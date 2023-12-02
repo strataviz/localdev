@@ -14,15 +14,23 @@ $(MINIODIR):
 KUBECTL ?= kubectl
 KUSTOMIZE ?= $(LOCALBIN)/kustomize
 
+ISTIO_VERSION ?= 1.20.0
+
 .PHONY: deps
 deps: kustomize
 
-.PHONY: kustomize
+.PHONY: kustomize istioctl
 kustomize: $(KUSTOMIZE)
 $(KUSTOMIZE): $(LOCALBIN)
 	@curl -sSLo ./scripts/install_kustomize.sh "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 	@chmod +x ./scripts/install_kustomize.sh
 	@./scripts/install_kustomize.sh $(KUSTOMIZE_VERSION) $(LOCALBIN)
+
+.PHONY: istioctl
+istioctl: $(LOCALBIN)
+	@curl -sSLo ./scripts/install_istioctl.sh "https://istio.io/downloadIstioctl"
+	@chmod +x ./scripts/install_istioctl.sh
+	@./scripts/install_istioctl.sh -b $(LOCALBIN) $(ISTIO_VERSION)
 
 ## Install the local development environment.  I'd like to come
 ## back around and do this outside of the Makefile, but for now
@@ -40,10 +48,10 @@ kind:
 ## this in as optional based on an environment variable plus I actually
 ## need to get it working properly and document it.
 .PHONY: install
-install: $(KUSTOMIZE) $(MINIODIR) install-cert-manager install-spark-system install-redpanda install-genie install-minio install-otel-system
+install: $(KUSTOMIZE) $(MINIODIR) install-istio install-istio-controlplane install-cert-manager install-spark-system install-redpanda install-genie install-minio install-otel-system install-argocd
 
 .PHONY: uninstall
-uninstall: uninstall-otel-system uninstall-minio uninstall-genie uninstall-redpanda uninstall-spark-system uninstall-cert-manager
+uninstall: uninstall-argocd uninstall-otel-system uninstall-minio uninstall-genie uninstall-redpanda uninstall-spark-system uninstall-cert-manager install-istio install-istio-controlplane
 
 .PHONY: install-cert-manager
 install-cert-manager:
@@ -144,6 +152,23 @@ install-argocd:
 .PHONY: uninstall-argocd
 uninstall-argocd:
 	-@kubectl delete -k k8s/argocd
+
+.PHONY: install-istio-operator
+install-istio-operator:
+	istioctl operator init
+
+.PHONY: uninstall-istio-operator
+uninstall-istio-operator:
+	istioctl operator remove
+
+.PHONY: install-istio
+install-istio:
+	@$(KUSTOMIZE) build k8s/istio | envsubst | kubectl apply -f -
+	@kubectl wait --for=condition=available --timeout=120s deploy -l release=istio -n istio-system
+
+.PHONY: uninstall-istio
+uninstall-istio:
+	-@kubectl delete -k k8s/istio
 
 .PHONY: clean
 clean:
