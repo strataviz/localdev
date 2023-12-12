@@ -5,11 +5,7 @@ commonAnnotations:
   strata.ctx.sh/support: "https://github.com/strataviz/localdev/issues"
 commonLabels:
   app.kubernetes.io/managed-by: kustomize
-  app.kubernetes.io/group: argocd
-namespace: argocd
+  app.kubernetes.io/group: istio
+namespace: istio-system
 resources:
-  - namespace.yaml
-  - crd.yaml
-  - config.yaml
-  - rbac.yaml
-  - install.yaml
+  - controlplane.yaml
