@@ -72,6 +72,15 @@ install-spark-system:
 uninstall-spark-system:
 	-@kubectl delete -k k8s/spark-system
 
+.PHONY: install-flink
+install-flink: install-spark-system
+	@$(KUSTOMIZE) build k8s/flink | envsubst | kubectl apply -f -
+	@kubectl wait --for=condition=available --timeout=120s deploy -l app.kubernetes.io/group=flink
+
+.PHONY: uninstall-flink
+uninstall-flink:
+	-@kubectl delete -k k8s/flink
+
 .PHONY: install-redpanda-system
 install-redpanda-system:
 	@$(KUSTOMIZE) build k8s/redpanda-system | envsubst | kubectl apply -f -
