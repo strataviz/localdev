@@ -48,10 +48,10 @@ kind:
 ## this in as optional based on an environment variable plus I actually
 ## need to get it working properly and document it.
 .PHONY: install
-install: $(KUSTOMIZE) $(MINIODIR) install-istio install-istio-controlplane install-cert-manager install-spark-system install-redpanda install-genie install-minio install-otel-system install-argocd
+install: $(KUSTOMIZE) $(MINIODIR) install-cert-manager install-spark-system install-redpanda install-genie install-minio install-otel-system install-argocd
 
 .PHONY: uninstall
-uninstall: uninstall-argocd uninstall-otel-system uninstall-minio uninstall-genie uninstall-redpanda uninstall-spark-system uninstall-cert-manager install-istio install-istio-controlplane
+uninstall: uninstall-argocd uninstall-otel-system uninstall-minio uninstall-genie uninstall-redpanda uninstall-spark-system uninstall-cert-manager
 
 .PHONY: install-cert-manager
 install-cert-manager:
