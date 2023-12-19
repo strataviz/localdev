@@ -7,4 +7,9 @@ commonLabels:
   app.kubernetes.io/managed-by: kustomize
   app.kubernetes.io/group: flink
 resources:
-  - install.yaml
+  - namespace.yaml
+  - crd.yaml
+  - role.yaml
+  - role-binding.yaml
+  - config.yaml
+  - operator.yaml

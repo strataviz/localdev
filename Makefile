@@ -81,7 +81,7 @@ uninstall-spark-system:
 	-@kubectl delete -k k8s/spark-system
 
 .PHONY: install-flink
-install-flink: install-spark-system
+install-flink:
 	@$(KUSTOMIZE) build k8s/flink | envsubst | kubectl apply -f -
 	@kubectl wait --for=condition=available --timeout=120s deploy -l app.kubernetes.io/group=flink
 
